@@ -1,0 +1,116 @@
+SELECT * 
+FROM Cyclistic..[cyclistic.annual]
+
+---ANALYZE RIDE FREQUENCY FOR MEMBERS AND CASUAL RIDERS---
+
+SELECT member_casual, count(*) AS ride_frequency
+FROM [Cyclistic]..[cyclistic.annual]
+GROUP BY member_casual;
+
+---RIDE FREQUENCY FOR CASUAL RIDERS---
+
+select COUNT(*)  AS ride_frequency
+FROM[Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'casual';
+
+---RIDE FREQUENCY FOR ANNUAL MEMBERS---
+
+SELECT COUNT(*) AS ride_frequency
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'member';
+
+---ANALYZE AVERAGE RIDE DURATIONS FOR ANNUAL MEMBERS---
+
+SELECT AVG(DATEDIFF(MINUTE, started_at, ended_at))
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'member';
+
+---ANALYZE AVERAGE RIDE DURATION FOR CASUAL RIDERS---
+
+SELECT AVG(DATEDIFF(MINUTE, started_at, ended_at))
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'casual';
+
+---IDENTIFY MOST FREQUENT START AND STOP STATIONS FOR MEMBERS---
+
+SELECT start_station_name, COUNT(*) AS frequency
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual= 'member' and start_station_name IS NOT NULL
+GROUP BY start_station_name
+ORDER BY frequency DESC;
+
+SELECT end_station_name, COUNT(*) AS frequency
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual ='member' and end_station_name IS NOT NULL
+GROUP BY end_station_name
+ORDER BY frequency DESC;
+
+--- IDENTIFY MOST FREQUENT START AND STOP STATIONS FOR CASUAL RIDERS---
+
+SELECT start_station_name, COUNT(*) AS frequency
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'casual' and start_station_name IS NOT NULL
+GROUP BY start_station_name
+ORDER BY frequency DESC;
+
+SELECT end_station_name, COUNT(*) AS frequency
+FROM [Cyclistic]..[cyclistic.annual]
+WHERE member_casual = 'casual' and end_station_name IS NOT NULL
+GROUP BY end_station_name 
+ORDER BY frequency DESC;
+
+---IDENTIFY PEAK USAGE TIMES FOR BOTH MEMBERS AND CASUAL RIDERS---
+
+SELECT DATEPART(HOUR, started_at) AS hour_of_day, DATEPART(WEEKDAY, started_at) AS weekday, COUNT(*) AS ride_frequency
+FROM Cyclistic..[cyclistic.annual]
+WHERE member_casual = 'member'
+GROUP BY DATEPART(HOUR, started_at), DATEPART(WEEKDAY, started_at)
+ORDER BY ride_frequency DESC;
+
+
+SELECT DATEPART(HOUR, started_at) AS hour_of_day, DATEPART(WEEKDAY, started_at) AS weekday, COUNT(*) AS ride_frequency 
+FROM [cyclistic.annual]
+WHERE member_casual = 'casual'
+GROUP BY DATEPART(HOUR, started_at), DATEPART(weekday, started_at)
+ORDER BY ride_frequency DESC;
+
+---STATISTICAL SUMMARY ---
+
+SELECT
+	member_casual AS MemberType,
+	COUNT(*) AS RideFrequency,
+	AVG(DATEDIFF(MINUTE, 0, ride_length)) AS RideDuration,
+	MAX(start_station_name) AS PopularStartStation,
+	MAX(end_station_name) AS PopularEndStation,
+	DATEPART(HOUR, started_at) AS PeakHour,
+	DATENAME(WEEKDAY, started_at) AS PeakWeekday,
+	MIN(DATEDIFF(MINUTE, 0, ride_length)) AS MinRideDuration,
+	MAX(DATEDIFF(MINUTE, 0, ride_length)) AS MaxRideDuration,
+	STDEV(DATEDIFF(MINUTE, 0, ride_length)) AS RideDurationStdDev
+INTO [dbo].[AggregatedCyclisticUsage]
+FROM [cyclistic.annual]
+GROUP BY member_casual, DATEPART(HOUR, started_at), DATENAME(WEEKDAY, started_at);
+
+select *
+from AggregatedCyclisticUsage
+
+select *
+from [cyclistic.annual]
+
+
+
+
+
+
+
+select
+	ride_length,
+	rideable_type,
+	start_station_name,
+	end_station_name,
+	member_casual
+INTO [dbo].aggregatedstart
+from [cyclistic.annual]
+
+SELECT *
+FROM aggregatedstart
