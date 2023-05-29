@@ -1,0 +1,76 @@
+To be able to look at all the data in one place we need to combine it so it can be one cohesive piece
+in order to do that I used union to combine. I also filtered out the nulls using the Where clause.
+
+
+-------Combining all 12 datasets into one and calling it 'cyclistic.annual'-------
+select * into [cyclistic.annual]
+( 
+	select * from [2205]
+	union
+	select * from ['202206-bd$']
+	union
+	select * from ['202207-divvy-tripdata$']
+	union
+	select * from ['202208-divvy-tripdata$']
+	union
+	select * from ['202209-divvy-publictripdata$']
+	union
+	select * from ['202210-divvy-tripdata$']
+	union 
+	select * from ['202211-divvy-tripdata$']
+	union
+	select * from ['202212-divvy-tripdata$']
+	union 
+	select * from ['202301-divvy-tripdata$']
+	union 
+	select * from ['202302-divvy-tripdata$']
+	union
+	select * from ['202303-divvy-tripdata$']
+	union
+	select * from ['202304-divvy-tripdata$']
+) AS [CyclisticAnnual]
+where [start_station_name] is not null
+	and [start_station_id] is not null
+	and [end_station_name] is not null
+	and [end_station_id] is not null
+;
+
+select * 
+from [cyclistic.annual];
+
+
+-----------change month format to show name
+	ALTER TABLE [cyclistic.annual]
+ADD month_name VARCHAR(20);
+
+UPDATE dbo.[cyclistic.annual]
+SET	[month_name] = FORMAT(started_at, 'MMMM')
+
+------------CHANGE WEEKDAY FORMAT TO SHOW NAME--
+
+ALTER TABLE [dbo].[cyclistic.annual]
+ADD weekday_name VARCHAR(20);
+
+UPDATE [dbo].[cyclistic.annual]
+set[weekday_name] = DATENAME(WEEKDAY, day_of_week);
+
+ALTER TABLE [dbo].[cyclistic.annual]
+DROP COLUMN day_of_week;
+
+select * 
+from [cyclistic.annual]
+
+
+--alter ride_length column to show only length of ride instead of date and time--
+
+ALTER TABLE [dbo].[cyclistic.annual]
+ADD ride_length_time TIME;
+
+UPDATE [dbo].[cyclistic.annual]
+SET ride_length_time = CONVERT(TIME, ride_length);
+
+ALTER TABLE [dbo].[cyclistic.annual]
+DROP COLUMN ride_length;
+
+select * 
+from [dbo].[cyclistic.annual]
